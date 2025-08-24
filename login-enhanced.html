@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔑 Login - Smart Surplus Food</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .login-container {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 420px;
+      backdrop-filter: blur(10px);
+    }
+
+    .login-container h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #333;
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #e1e8ed;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: #49b47b;
+      box-shadow: 0 0 0 3px rgba(73, 180, 123, 0.1);
+    }
+
+    .form-group input::placeholder {
+      color: #999;
+    }
+
+    .remember-me-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .remember-me-container input[type="checkbox"] {
+      width: auto;
+      margin-right: 0.5rem;
+      transform: scale(1.2);
+    }
+
+    .remember-me-container label {
+      color: #666;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      background: linear-gradient(135deg, #49b47b, #3d875f);
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 1.5rem;
+    }
+
+    button[type="submit"]:hover {
+      background: linear-gradient(135deg, #3d875f, #2d6343);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(73, 180, 123, 0.3);
+    }
+
+    button[type="submit"]:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .separator {
+      text-align: center;
+      margin: 1.5rem 0;
+      position: relative;
+      color: #999;
+      font-size: 0.9rem;
+    }
+
+    .separator::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #e1e8ed;
+    }
+
+    .separator span {
+      background: white;
+      padding: 0 1rem;
+    }
+
+    .social-login-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .social-button {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      color: white;
+    }
+
+    .social-button.google {
+      background: #db4437;
+    }
+
+    .social-button.google:hover {
+      background: #bf3b32;
+      transform: translateY(-2px);
+    }
+
+    .social-button.facebook {
+      background: #3b5998;
+    }
+
+    .social-button.facebook:hover {
+      background: #30487b;
+      transform: translateY(-2px);
+    }
+
+    .social-button svg {
+      width: 20px;
+      height: 20px;
+      margin-right: 0.5rem;
+      fill: white;
+    }
+
+    .register-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .register-link a {
+      color: #49b47b;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .register-link a:hover {
+      color: #3d875f;
+      text-decoration: underline;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      z-index: 2000;
+      max-width: 300px;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .notification.success { background: #28a745; }
+    .notification.error { background: #dc3545; }
+    .notification.info { background: #17a2b8; }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #ffffff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 2rem;
+        margin: 1rem;
+      }
+      
+      .social-login-buttons {
+        flex-direction: column;
+      }
+      
+      .login-container h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>🔑 Login to Smart Surplus</h1>
+    
+    <form id="loginForm" autocomplete="off" novalidate>
+      <div class="form-group">
+        <input type="email" id="email" name="email" placeholder="📧 Email Address" required autocomplete="username" />
+      </div>
+      
+      <div class="form-group">
+        <input type="password" id="password" name="password" placeholder="🔒 Password" required autocomplete="current-password" minlength="6" />
+      </div>
+      
+      <div class="remember-me-container">
+        <input type="checkbox" id="rememberMe" name="remember" />
+        <label for="rememberMe">Remember me for 30 days</label>
+      </div>
+      
+      <button type="submit" id="loginBtn">
+        <span id="loginText">🚀 Login</span>
+      </button>
+    </form>
+
+    <div class="separator">
+      <span>OR</span>
+    </div>
+
+    <div class="social-login-buttons">
+      <button class="social-button google" type="button" onclick="loginWithGoogle()">
+        <svg viewBox="0 0 24 24">
+          <path d="M21.35,11.1h-9.14v2.92h5.87C16.2,16.39,14,18,11.06,18c-3.49,0-6.33-2.85-6.33-6.36 0-3.51,2.84-6.36,6.33-6.36 1.72,0,3.29,0.72,4.36,1.87l1.96-1.96C15.18,5.88,13.23,5.05,11.06,5.05 5.89,5.05,1.79,9.12,1.79,14.3c0,5.18,4.1,9.26,9.27,9.26 5.94,0,9.62-4.11,9.62-9.94C22.68,12.13,22.15,11.47,21.35,11.1z"/>
+        </svg>
+        Google
+      </button>
+
+      <button class="social-button facebook" type="button" onclick="loginWithFacebook()">
+        <svg viewBox="0 0 24 24">
+          <path d="M22 12.07C22 6.49 17.52 2 12 2 6.5 2 2 6.49 2 12.07c0 4.99 3.66 9.13 8.44 9.93v-7.02H7.9v-2.9h2.54V9.83c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.87h2.78l-.44 2.9h-2.34v7.02c4.78-.79 8.44-4.94 8.44-9.93z"/>
+        </svg>
+        Facebook
+      </button>
+    </div>
+
+    <div class="register-link">
+      Don't have an account? <a href="register.html">Sign up here</a>
+    </div>
+
+    <div style="text-align: center; margin-top: 1rem;">
+      <a href="index.html" style="color: #49b47b; text-decoration: none;">← Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🔑 Login page loaded');
+      
+      // Pre-fill for testing (remove in production)
+      if (window.location.search.includes('debug')) {
+        document.getElementById('email').value = 'recipient@test.com';
+        document.getElementById('password').value = 'recipient123';
+      }
+    });
+
+    // Regular login form handler
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('loginBtn');
+      const loginText = document.getElementById('loginText');
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const rememberMe = document.getElementById('rememberMe').checked;
+      
+      if (!email || !password) {
+        showNotification('Please enter both email and password', 'error');
+        return;
+      }
+      
+      try {
+        // Show loading state
+        submitBtn.disabled = true;
+        loginText.innerHTML = '<span class="loading"></span>Logging in...';
+        
+        console.log('🔑 Attempting login for:', email);
+        
+        const response = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        console.log('📥 Login response:', { success: response.ok, user: data.user?.name, role: data.user?.role });
+        
+        if (response.ok && data.token && data.user) {
+          // Store authentication data
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('role', data.user.role.toLowerCase());
+          localStorage.setItem('name', data.user.name);
+          
+          if (rememberMe) {
+            // Store remember me preference (in real app, handle server-side)
+            localStorage.setItem('rememberMe', 'true');
+          }
+          
+          console.log('✅ Login successful:', data.user.name, '(' + data.user.role + ')');
+          
+          showNotification(`Welcome back, ${data.user.name}!`, 'success');
+          
+          // Redirect based on role after short delay
+          setTimeout(() => {
+            if (data.user.role.toLowerCase() === 'donor' || data.user.role.toLowerCase() === 'admin') {
+              console.log('🎛️ Redirecting donor/admin to dashboard');
+              window.location.href = 'bulletproof-add-food.html';
+            } else {
+              console.log('🏠 Redirecting recipient to home page');
+              window.location.href = 'index-bulletproof.html';
+            }
+          }, 1500);
+          
+        } else {
+          throw new Error(data.message || 'Login failed');
+        }
+        
+      } catch (error) {
+        console.error('❌ Login error:', error);
+        showNotification(`Login failed: ${error.message}`, 'error');
+        
+      } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        loginText.textContent = '🚀 Login';
+      }
+    });
+
+    // Google OAuth login
+    async function loginWithGoogle() {
+      try {
+        showNotification('Redirecting to Google login...', 'info');
+        
+        // In a real implementation, you would:
+        // 1. Redirect to Google OAuth endpoint
+        // 2. Handle the callback
+        // 3. Exchange the code for user data
+        // 4. Create/login the user in your backend
+        
+        // For demo purposes, simulate Google login
+        setTimeout(async () => {
+          try {
+            // Simulate Google user data
+            const mockGoogleUser = {
+              email: 'user@gmail.com',
+              name: 'Google User',
+              role: 'recipient',
+              provider: 'google'
+            };
+            
+            // In real app, send this to your backend to create/login user
+            const response = await simulateOAuthLogin(mockGoogleUser);
+            
+            if (response.success) {
+              localStorage.setItem('token', response.token);
+              localStorage.setItem('role', response.user.role.toLowerCase());
+              localStorage.setItem('name', response.user.name);
+              
+              showNotification(`Welcome ${response.user.name}!`, 'success');
+              
+              setTimeout(() => {
+                window.location.href = 'index-bulletproof.html';
+              }, 1500);
+            } else {
+              throw new Error(response.message || 'Google login failed');
+            }
+            
+          } catch (error) {
+            showNotification(`Google login failed: ${error.message}`, 'error');
+          }
+        }, 1000);
+        
+      } catch (error) {
+        console.error('Google login error:', error);
+        showNotification('Google login is currently unavailable', 'error');
+      }
+    }
+
+    // Facebook OAuth login
+    async function loginWithFacebook() {
+      try {
+        showNotification('Redirecting to Facebook login...', 'info');
+        
+        // Similar to Google, in real implementation:
+        // 1. Use Facebook SDK
+        // 2. Handle OAuth flow
+        // 3. Exchange token for user data
+        // 4. Backend integration
+        
+        setTimeout(async () => {
+          try {
+            const mockFacebookUser = {
+              email: 'user@facebook.com',
+              name: 'Facebook User',
+              role: 'recipient',
+              provider: 'facebook'
+            };
+            
+            const response = await simulateOAuthLogin(mockFacebookUser);
+            
+            if (response.success) {
+              localStorage.setItem('token', response.token);
+              localStorage.setItem('role', response.user.role.toLowerCase());
+              localStorage.setItem('name', response.user.name);
+              
+              showNotification(`Welcome ${response.user.name}!`, 'success');
+              
+              setTimeout(() => {
+                window.location.href = 'index-bulletproof.html';
+              }, 1500);
+            } else {
+              throw new Error(response.message || 'Facebook login failed');
+            }
+            
+          } catch (error) {
+            showNotification(`Facebook login failed: ${error.message}`, 'error');
+          }
+        }, 1000);
+        
+      } catch (error) {
+        console.error('Facebook login error:', error);
+        showNotification('Facebook login is currently unavailable', 'error');
+      }
+    }
+
+    // Simulate OAuth login (replace with real backend integration)
+    async function simulateOAuthLogin(userData) {
+      // In real implementation, send userData to your backend
+      // Backend should create user if doesn't exist, then return JWT token
+      
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          // Simulate successful OAuth login
+          resolve({
+            success: true,
+            token: 'mock-oauth-jwt-token-' + Date.now(),
+            user: {
+              name: userData.name,
+              email: userData.email,
+              role: userData.role,
+              provider: userData.provider
+            }
+          });
+        }, 500);
+      });
+    }
+
+    // Notification system
+    function showNotification(message, type = 'info') {
+      // Remove existing notifications
+      const existing = document.querySelector('.notification');
+      if (existing) {
+        existing.remove();
+      }
+      
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 5000);
+    }
+
+    // Clear any expired tokens on page load
+    window.addEventListener('load', () => {
+      const token = localStorage.getItem('token');
+      const rememberMe = localStorage.getItem('rememberMe');
+      
+      if (token && !rememberMe) {
+        // Check if token is older than 24 hours (implement proper token validation)
+        console.log('Token found, validating...');
+      }
+    });
+  </script>
+</body>
+</html>

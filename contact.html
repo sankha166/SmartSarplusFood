@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>My Contacts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --bg:#0b1220; --card:#131c2b; --text:#e6eefc; --muted:#9fb0d6; --accent:#6da7ff; --line:#21314d; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 80% -10%, #16233a, #0b1220 60%);
+      color: var(--text);
+    }
+    .wrap { max-width: 900px; margin: 32px auto; padding: 0 16px; }
+    h1 { font-weight: 700; letter-spacing: .3px; margin: 12px 0 16px; }
+    .toolbar {
+      display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 8px 0 20px;
+    }
+    .btn {
+      border: 1px solid var(--line); background: linear-gradient(180deg, #1b2740, #121a2b);
+      color: var(--text); padding: 10px 14px; border-radius: 14px; cursor: pointer;
+      font-weight: 600; transition: transform .08s ease, border-color .15s ease, background .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); border-color: var(--accent); }
+    .grid {
+      display: grid; gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 14px 14px 12px;
+      display: grid; gap: 8px;
+    }
+    .name { font-size: 1.05rem; font-weight: 700; letter-spacing: .2px; }
+    .meta { color: var(--muted); font-size: 0.95rem; display: grid; gap: 4px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .actions { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+    .chip {
+      font-size: 0.85rem; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted);
+    }
+    .footer { color: var(--muted); font-size: 0.9rem; margin-top: 18px; }
+    .sr-only { position: absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Contacts</h1>
+    <div class="toolbar">
+      <button class="btn" id="downloadAll">Download All (.vcf)</button>
+      <span class="chip">Tip: Click email or phone to open your mail/phone app</span>
+    </div>
+
+    <!-- Fixed container -->
+    <div id="cards" class="grid" aria-live="polite" style="width: 1000px;"></div>
+
+    <!-- Footer placed correctly -->
+    <p class="footer">
+      vCard files can be imported into Google Contacts, iCloud, Outlook, and most phone contact apps.
+    </p>
+  </div>
+
+  <script>
+    // --- Your contacts (edit here if needed) ---
+    const contacts = [
+      {
+        first: "Sankhadeep", last: "Satra",
+        email: "sankhadeep.satra.cse28@heritageit.edu.in",
+        phone: "+91 8670203075"
+      },
+      {
+        first: "Swapnanil", last: "Ghosh",
+        email: "swapnanil.ghosh.cse28@heritageit.edu.in",
+        phone: "+91 9674734908"
+      },
+      {
+        first: "Riya", last: "Singh",
+        email: "riya.singh.civil27@heritageit.edu.in",
+        phone: "+91 8100211727"
+      },
+      {
+        first: "Supriyo", last: "Das",
+        email: "supriyo.das.cse28@heritageit.edu.in",
+        phone: "+91 9233206210"
+      }
+    ];
+
+    // --- Helpers ---
+    const telHref = p => "tel:" + p.replace(/[^+\d]/g, "");
+    const escapeVCF = s => String(s || "").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\n/g, "\\n");
+
+    function makeVCard(c) {
+      const fn = `${c.first} ${c.last}`.trim();
+      const n = `${escapeVCF(c.last)};${escapeVCF(c.first)};;;`;
+      const tel = c.phone ? `TEL;TYPE=CELL:${c.phone.replace(/\s+/g,'')}` : "";
+      return [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        `N:${n}`,
+        `FN:${escapeVCF(fn)}`,
+        c.email ? `EMAIL;TYPE=INTERNET:${c.email}` : "",
+        tel,
+        "END:VCARD"
+      ].filter(Boolean).join("\r\n");
+    }
+
+    function download(filename, text) {
+      const blob = new Blob([text], { type: "text/vcard;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function renderCards() {
+      const container = document.getElementById("cards");
+      container.innerHTML = "";
+      contacts.forEach((c, idx) => {
+        const card = document.createElement("article");
+        card.className = "card";
+        const full = `${c.first} ${c.last}`.trim();
+
+        card.innerHTML = `
+          <div class="name">${full}</div>
+          <div class="meta">
+            <div>Email: <a href="mailto:${c.email}">${c.email}</a></div>
+            <div>Phone: <a href="${telHref(c.phone)}">${c.phone}</a></div>
+          </div>
+          <div class="actions">
+            <button class="btn" data-idx="${idx}">Download vCard</button>
+          </div>
+        `;
+        card.querySelector("button").addEventListener("click", () => {
+          download(`${full.replace(/\s+/g, "_")}.vcf`, makeVCard(c));
+        });
+        container.appendChild(card);
+      });
+    }
+
+    // Download all contacts as one .vcf file
+    document.getElementById("downloadAll").addEventListener("click", () => {
+      const all = contacts.map(makeVCard).join("\r\n");
+      download("All_Contacts.vcf", all);
+    });
+
+    renderCards();
+  </script>
+</body>
+</html>

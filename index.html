@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Surplus Food</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  margin: 0;
+  background: #f8fafc;
+  color: #23272f;
+  padding-top: 70px; /* for fixed navbar */
+}
+
+/* Navbar */
+nav {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  background: #252c41;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  flex-wrap: wrap;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+}
+.nav-left a, .nav-right a {
+  color: #fff;
+  text-decoration: none;
+  margin: 0 0.7em;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-left a:hover, .nav-right a:hover {
+  color: #75d179;
+}
+.nav-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #a5f495;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+  background: linear-gradient(80deg, #ddd999 60%, #9ce8b3 100%);
+  max-width: 2000px;
+  margin: 0 auto;
+}
+.hero h1 {
+  font-size: 2.8rem;
+  color: #252c41;
+}
+.hero p {
+  font-size: 1.3rem;
+  color: #4c585e;
+  margin-top: 1em;
+}
+.hero-buttons {
+  margin-top: 2em;
+}
+.hero-btn {
+  padding: 0.9em 2em;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  margin: 0 0.5em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.hero-btn.find {
+  background: #49b47b;
+  color: #fff;
+}
+.hero-btn.find:hover {
+  background: #3d875f;
+}
+.hero-btn.donate {
+  background: #fff;
+  color: #49b47b;
+  border: 2px solid #49b47b;
+}
+.hero-btn.donate:hover {
+  background: #49b47b;
+  color: #fff;
+}
+
+/* Stats */
+#stats {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+  margin: 2.5rem auto;
+  max-width: 900px;
+}
+.stat-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 2em 1.5em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+  flex: 1 1 180px;
+}
+.stat-card h2 {
+  font-size: 1.4rem;
+  color: #49b47b;
+  margin: 0;
+}
+.stat-card p {
+  margin: 0.2em 0 0;
+  font-size: 1.1rem;
+  color: #23272f;
+  font-weight: 600;
+}
+
+/* Section Title */
+.section-title {
+  text-align: center;
+  margin: 2rem 0 1rem;
+  font-size: 1.75rem;
+  color: #3a7d44;
+}
+
+/* Food List & Cards */
+.food-list-container {
+  display: grid;
+  gap: 1.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  max-width: 1100px;
+  margin: 2rem auto 3rem;
+  padding: 0 1rem;
+}
+.food-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: box-shadow 0.3s;
+}
+.food-card:hover {
+  box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+}
+.food-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 1px solid #eee;
+}
+.food-details {
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.food-categories {
+  margin-bottom: 8px;
+}
+.food-category {
+  display: inline-block;
+  background: #49b47b;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 16px;
+  margin-right: 8px;
+  text-transform: uppercase;
+}
+.food-details h3 {
+  font-size: 1.25rem;
+  color: #3a7d44;
+  margin: 0 0 0.5rem;
+}
+.food-details p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+.food-footer-info {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  color: #2c7a2c;
+}
+.request-btn {
+  margin-top: auto;
+  padding: 0.8em;
+  background: #49b47b;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+.request-btn:hover {
+  background: #3d875f;
+}
+
+/* Footer */
+.site-footer {
+  background: #2c3e50;
+  color: #ecf0f1;
+  padding: 40px 20px;
+  font-size: 14px;
+}
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: auto;
+}
+.footer-about, .footer-links, .footer-contact, .footer-social {
+  flex: 1 1 200px;
+  margin: 10px;
+}
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+}
+.footer-links li {
+  margin: 5px 0;
+}
+.footer-links a, .footer-contact a {
+  color: #ecf0f1;
+  text-decoration: none;
+}
+.footer-links a:hover, .footer-contact a:hover {
+  text-decoration: underline;
+}
+.footer-social a img {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+}
+.footer-bottom {
+  text-align: center;
+  margin-top: 30px;
+  border-top: 1px solid #7f8c8d;
+  padding-top: 20px;
+  font-size: 13px;
+}
+.footer-bottom a {
+  color: #ecf0f1;
+  text-decoration: none;
+  margin: 0 5px;
+}
+.footer-bottom a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2rem; }
+  #stats { gap: 1.5rem; }
+}
+@media (max-width: 480px) {
+  .hero h1 { font-size: 1.6rem; }
+  .hero p { font-size: 1.1rem; }
+  .hero-btn { width: 100%; margin: 0.5rem 0; }
+}
+@media (max-width: 600px) {
+  .food-list-container {
+    grid-template-columns: 1fr;
+  }
+}
+.food-list-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: center;
+  margin-bottom: 55px;
+}
+
+.food-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 22px rgba(0,0,0,0.11);
+  width: 340px;
+  padding: 0 0 16px 0;
+  margin: 12px;
+  transition: box-shadow 0.2s;
+}
+.food-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+.food-card-header {
+  padding: 12px 16px 0 16px;
+  display: flex;
+  gap: 8px;
+}
+.tag {
+  display: inline-block;
+  font-size: 0.8em;
+  padding: 2px 10px;
+  border-radius: 12px;
+  margin-right: 5px;
+  background: #59c352;
+  color: #fff;
+}
+.tag.new { background: #f6a622; }
+.tag.veg { background: #3db94a; }
+
+.food-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+}
+.food-card-body {
+  padding: 14px 18px 8px 18px;
+  flex: 1 1 auto;
+}
+.food-title {
+  margin: 5px 0 8px 0;
+  font-size: 1.3em;
+}
+.food-desc {
+  color: #696969;
+  font-size: 1em;
+  margin-bottom: 8px;
+}
+.food-meta {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0 0;
+  font-size: 0.98em;
+  color: #444;
+}
+.food-meta li {
+  margin-bottom: 2px;
+}
+.food-card-footer {
+  padding: 0 18px 0 18px;
+}
+.reserve-btn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 10px 0;
+  border: none;
+  background: #24af63;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+}
+.reserve-btn:hover {
+  background: #178f4e;
+}
+
+    /* Updated card styles for food list with 3 cards per row */
+    .food-list-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      justify-content: center;
+      margin-bottom: 48px;
+    }
+
+    .food-card {
+      flex: 1 1 calc(33.333% - 32px); /* 3 cards per row */
+      max-width: 340px; /* optional */
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 4px 22px rgba(0,0,0,0.11);
+      padding: 0 0 16px;
+      margin: 12px 0;
+      transition: box-shadow 0.2s;
+    }
+    .food-card:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .food-card-header {
+      padding: 12px 16px 0 16px;
+      display: flex;
+      gap: 8px;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.8em;
+      padding: 2px 10px;
+      border-radius: 12px;
+      color: #fff;
+    }
+    .tag.new { background: #f6a622; }
+    .tag.veg { background: #3db94a; }
+    .tag.fruit { background: #e97451; }
+    .tag.salad { background: #59c352; }
+    
+    .food-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px 10px 0 0;
+    }
+    .food-card-body {
+      padding: 14px 18px 8px 18px;
+      flex: 1 1 auto;
+    }
+    .food-title {
+      margin: 5px 0 8px 0;
+      font-size: 1.3em;
+    }
+    .food-desc {
+      color: #696969;
+      font-size: 1em;
+      margin-bottom: 8px;
+    }
+    .food-meta {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0 0;
+      font-size: 0.98em;
+      color: #444;
+    }
+    .food-meta li {
+      margin-bottom: 2px;
+      line-height: 1.3;
+    }
+    .food-card-footer {
+      padding: 0 18px 0 18px;
+    }
+    .reserve-btn {
+      width: 100%;
+      margin-top: 14px;
+      padding: 10px 0;
+      border: none;
+      background: #24af63;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .reserve-btn:hover {
+      background: #178f4e;
+    }
+
+    /* Profile Menu Styles */
+    .profile-menu {
+      position: relative;
+      display: inline-block;
+    }
+    
+    #profileIcon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #49b47b;
+      object-fit: cover;
+      transition: transform 0.2s ease;
+    }
+    
+    #profileIcon:hover {
+      transform: scale(1.1);
+      border-color: #3d875f;
+    }
+    
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      z-index: 1000;
+      border: 1px solid #ddd;
+    }
+    
+    .dropdown-content a {
+      color: #333;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.2s;
+    }
+    
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+    
+    .dropdown-content a:first-child {
+      border-radius: 8px 8px 0 0;
+    }
+    
+    .food-card:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    
+    .food-card-header {
+      padding: 12px 16px 0 16px;
+      display: flex;
+      gap: 8px;
+    }
+    
+    .tag {
+      display: inline-block;
+      font-size: 0.8em;
+      padding: 2px 10px;
+      border-radius: 12px;
+      color: #fff;
+    }
+    .tag.new { background: #f6a622; }
+    .tag.veg { background: #3db94a; }
+    .tag.fruit { background: #e97451; }
+    .tag.salad { background: #59c352; }
+    
+    .food-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px 10px 0 0;
+    }
+    
+    .food-card-body {
+      padding: 14px 18px 8px 18px;
+      flex: 1 1 auto;
+    }
+    
+    /* User welcome text */
+    .user-welcome {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .food-card {
+        flex: 1 1 calc(50% - 32px);
+      }
+    }
+    @media (max-width: 700px) {
+      .food-card {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav>
+    <div class="nav-left">
+      <span class="nav-brand">Smart Surplus</span>
+      <a href="index.html">Home</a>
+      <a href="events.html">Events</a>
+      <a href="analytics.html">Impact</a>
+    </div>
+    <div class="nav-right" id="navbarUser">
+      <span id="authButtons">
+        <a href="login.html">User Login</a> | 
+        <a href="login.html" class="hero-btn donate">Donate Surplus Food</a>
+      </span>
+      <div id="profileMenu" class="profile-menu" style="display:none;">
+        <img id="profileIcon" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIyMCIgZmlsbD0iIzQ5YjQ3YiIvPgogIDxjaXJjbGUgY3g9IjIwIiBjeT0iMTYiIHI9IjYiIGZpbGw9IndoaXRlIi8+CiAgPHBhdGggZD0iTTggMzJjMC04IDUuNS0xMiAxMi0xMnMxMiA0IDEyIDEyIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K" alt="Profile" />
+        <div id="profileDropdown" class="dropdown-content">
+          <a href="#" onclick="showProfile()">👤 My Profile</a>
+          <a href="#" onclick="showReservations()">📋 My Requests</a>
+          <a href="#" onclick="performLogout()">🚪 Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>Reduce Waste, Serve More.<br>Smart Surplus Food Initiative</h1>
+    <p>
+      List, find, and distribute surplus food across campus. Save meals, reduce environmental impact, and foster a connected community.
+    </p>
+    <div class="hero-buttons">
+      <button class="hero-btn find">Find Food Near You</button>
+      <a href="login.html" class="hero-btn donate">Donate Surplus Food</a>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <section id="stats">
+    <div class="stat-card"><h2 id="foodSaved">0 kg</h2><p>Food Saved</p></div>
+    <div class="stat-card"><h2 id="peopleServed">0</h2><p>People Served</p></div>
+    <div class="stat-card"><h2 id="carbonSaved">0 kg CO₂</h2><p>Carbon Saved</p></div>
+  </section>
+
+  <!-- Available Surplus Food Section -->
+  <h1 class="section-title">Available Surplus Food</h1>
+  <div id="foodList" class="food-list-container"> 
+    <!-- Food cards will be dynamically inserted here -->
+  </div>
+
+  <script>
+    // Constants
+    const API_URL = 'http://localhost:5000/api';
+    const BASE_URL = 'http://localhost:5000';
+    
+    // Global authentication state
+    let currentUser = null;
+    let authToken = null;
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('🚀 Page loaded, initializing...');
+      
+      // Load authentication state
+      await loadAuthenticationState();
+      
+      // Load content
+      loadFoodItems();
+      loadStats();
+      
+      // Setup event listeners
+      setupEventListeners();
+      
+      console.log('✅ Page initialization complete');
+    });
+
+    // Authentication Functions
+    async function loadAuthenticationState() {
+      console.log('🔍 Loading authentication state...');
+      
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+      const name = localStorage.getItem('name');
+      
+      console.log('💾 LocalStorage data:', { 
+        token: token ? 'Present' : 'Missing', 
+        role, 
+        name 
+      });
+      
+      if (!token || !role || !name) {
+        console.log('❌ Authentication data incomplete, showing login UI');
+        showLoginUI();
+        return;
+      }
+      
+      try {
+        console.log('🔐 Verifying token with server...');
+        const response = await fetch(`${API_URL}/auth/verify`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ Token verified successfully');
+          
+          // Set global state
+          authToken = token;
+          currentUser = data.user;
+          
+          // Update localStorage with fresh data
+          localStorage.setItem('role', data.user.role.toLowerCase());
+          localStorage.setItem('name', data.user.name);
+          
+          // Show authenticated UI
+          showAuthenticatedUI(data.user);
+          
+        } else {
+          throw new Error(`Token verification failed: ${response.status}`);
+        }
+        
+      } catch (error) {
+        console.warn('⚠️ Token verification failed:', error.message);
+        
+        // Try fallback with stored data
+        if (role && name) {
+          console.log('📦 Using cached authentication data');
+          currentUser = { role, name, email: 'cached@user.com' };
+          authToken = token;
+          showAuthenticatedUI(currentUser);
+          showNotification('Using cached login data. Limited functionality may apply.', 'warning');
+        } else {
+          console.log('🗑️ Clearing invalid authentication data');
+          localStorage.clear();
+          showLoginUI();
+        }
+      }
+    }
+
+    function showLoginUI() {
+      console.log('👆 Showing login UI');
+      
+      document.getElementById('authButtons').style.display = 'inline-block';
+      document.getElementById('profileMenu').style.display = 'none';
+      
+      currentUser = null;
+      authToken = null;
+    }
+
+    function showAuthenticatedUI(user) {
+      console.log('👤 Showing authenticated UI for:', user.name, '(' + user.role + ')');
+      
+      document.getElementById('authButtons').style.display = 'none';
+      document.getElementById('profileMenu').style.display = 'inline-block';
+      
+      // Show welcome notification
+      if (user.role.toLowerCase() === 'recipient') {
+        showWelcomeNotification(user.name);
+      }
+    }
+
+    function showWelcomeNotification(userName) {
+      const notification = document.createElement('div');
+      notification.className = 'welcome-notification';
+      notification.innerHTML = `
+        <strong>👋 Welcome back, ${userName}!</strong><br>
+        <small>Browse and reserve available food items below.</small>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Auto-remove after 4 seconds
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 4000);
+    }
+
+    // Food Functions
+    async function loadFoodItems() {
+      console.log('🍽️ Loading food items...');
+      const foodListEl = document.getElementById('foodList');
+      
+      try {
+        foodListEl.innerHTML = '<p style="text-align:center; color:#666;">Loading available food...</p>';
+        
+        const response = await fetch(`${API_URL}/food`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch food data');
+        }
+        
+        const foods = await response.json();
+        console.log(`📦 Loaded ${foods.length} food items`);
+        
+        if (foods.length === 0) {
+          foodListEl.innerHTML = '<p style="text-align:center; color:#999;">No surplus food available at the moment. Check back later!</p>';
+          return;
+        }
+        
+        // Render food cards
+        foodListEl.innerHTML = foods.map(food => `
+          <div class="food-card">
+            <div class="food-card-header">
+              <span class="tag new">Fresh</span>
+              <span class="tag veg">${food.type || 'Food'}</span>
+            </div>
+            <img src="${food.imageUrl ? BASE_URL + food.imageUrl : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop&crop=food&q=80'}" 
+                 alt="${food.name}" class="food-image" 
+                 onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop&crop=food&q=80'"/>
+            <div class="food-card-body">
+              <h2 class="food-title">${food.name}</h2>
+              <p class="food-desc">Fresh ${food.type} - ${food.freshnessStatus}</p>
+              <ul class="food-meta">
+                <li><strong>Location:</strong> ${food.location}</li>
+                <li><strong>Quantity:</strong> ${food.quantity} kg</li>
+                <li><strong>Expires:</strong> ${new Date(food.availableUntil).toLocaleDateString()} ${new Date(food.availableUntil).toLocaleTimeString()}</li>
+                <li><strong>Safe for:</strong> ${food.safeForHours} hours</li>
+                <li><strong>Added:</strong> ${new Date(food.createdAt).toLocaleDateString()}</li>
+              </ul>
+            </div>
+            <div class="food-card-footer">
+              <button class="reserve-btn" onclick="reserveFood('${food._id}', '${food.name.replace(/'/g, "\\'")}')"
+                      ${food.quantity <= 0 ? 'disabled style="background: #ccc; cursor: not-allowed;"' : ''}>
+                ${food.quantity <= 0 ? '❌ Unavailable' : '🍽️ Reserve This Food'}
+              </button>
+            </div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        console.error('❌ Error loading food:', error);
+        foodListEl.innerHTML = '<p style="text-align:center; color:red;">Failed to load food items. Please try again later.</p>';
+      }
+    }
+
+    // Food Reservation Function
+    async function reserveFood(foodId, foodName) {
+      console.log('🍽️ Reserve food called:', foodName);
+      
+      // Check authentication
+      if (!currentUser || !authToken) {
+        console.log('❌ Not authenticated, redirecting to login');
+        showNotification('Please login first to reserve food!', 'error');
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 2000);
+        return;
+      }
+      
+      // Check user role
+      if (currentUser.role.toLowerCase() === 'donor' || currentUser.role.toLowerCase() === 'admin') {
+        console.log('⚠️ Donor/admin cannot reserve food');
+        showNotification('Donors cannot reserve food. Please use the donor dashboard.', 'warning');
+        setTimeout(() => {
+          window.location.href = 'bulletproof-add-food.html';
+        }, 2000);
+        return;
+      }
+      
+      console.log('✅ Authentication check passed, proceeding with reservation');
+      
+      // Verify token is still valid
+      try {
+        const verifyResponse = await fetch(`${API_URL}/auth/verify`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        
+        if (!verifyResponse.ok) {
+          throw new Error('Token verification failed');
+        }
+        
+      } catch (error) {
+        console.log('❌ Token invalid, clearing auth and redirecting');
+        localStorage.clear();
+        showNotification('Your session has expired. Please login again.', 'error');
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 2000);
+        return;
+      }
+      
+      // Get reservation details
+      const quantity = prompt(`How many kg of "${foodName}" would you like to reserve?\n\nEnter quantity:`, '1.0');
+      if (!quantity || quantity <= 0) {
+        return;
+      }
+      
+      const message = prompt('Optional: Add a message for the donor:', 'I would like to reserve this food item. Thank you!');
+      
+      // Make reservation request
+      try {
+        console.log('📤 Sending reservation request...');
+        
+        const response = await fetch(`${API_URL}/reservations`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({
+            foodItemId: foodId,
+            quantityRequested: parseFloat(quantity),
+            message: message || ''
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          console.log('✅ Reservation successful');
+          showNotification(`Success! Your reservation request for ${quantity}kg of "${foodName}" has been sent to the donor!`, 'success');
+          
+          // Refresh food list
+          setTimeout(() => {
+            loadFoodItems();
+          }, 1000);
+          
+        } else {
+          throw new Error(data.message || 'Reservation failed');
+        }
+        
+      } catch (error) {
+        console.error('❌ Reservation error:', error);
+        showNotification(`Failed to send reservation request: ${error.message}`, 'error');
+      }
+    }
+
+    // Stats Functions
+    async function loadStats() {
+      try {
+        const response = await fetch(`${API_URL}/analytics/stats`);
+        const data = await response.json();
+        
+        document.getElementById('foodSaved').textContent = data.foodSaved + ' kg';
+        document.getElementById('peopleServed').textContent = data.peopleServed;
+        document.getElementById('carbonSaved').textContent = data.carbonSaved + ' kg CO₂';
+        
+      } catch (error) {
+        console.error('Failed to load stats:', error);
+        // Set default values
+        document.getElementById('foodSaved').textContent = '0 kg';
+        document.getElementById('peopleServed').textContent = '0';
+        document.getElementById('carbonSaved').textContent = '0 kg CO₂';
+      }
+    }
+
+    // Profile Functions
+    function showProfile() {
+      if (!currentUser) {
+        showNotification('Please login to view your profile.', 'error');
+        return;
+      }
+      
+      alert(`👤 Profile\n\nName: ${currentUser.name}\nRole: ${currentUser.role}\nEmail: ${currentUser.email || 'N/A'}`);
+    }
+
+    async function showReservations() {
+      if (!currentUser || !authToken) {
+        showNotification('Please login to view your reservations.', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/reservations/my`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch reservations');
+        }
+        
+        const reservations = await response.json();
+        
+        if (reservations.length === 0) {
+          alert('📋 My Reservations\n\nNo reservations yet. Start browsing available food items!');
+        } else {
+          const reservationList = reservations.map((r, i) => 
+            `${i + 1}. ${r.foodItem.name} (${r.quantityRequested}kg) - ${r.status.toUpperCase()}`
+          ).join('\n');
+          
+          alert(`📋 My Reservations (${reservations.length})\n\n${reservationList}`);
+        }
+        
+      } catch (error) {
+        console.error('Error loading reservations:', error);
+        showNotification('Failed to load your reservations. Please try again.', 'error');
+      }
+    }
+
+    function performLogout() {
+      console.log('🚪 Logging out...');
+      
+      localStorage.clear();
+      currentUser = null;
+      authToken = null;
+      
+      showLoginUI();
+      showNotification('Logged out successfully!', 'info');
+    }
+
+    // Event Listeners
+    function setupEventListeners() {
+      // Profile dropdown toggle
+      const profileIcon = document.getElementById('profileIcon');
+      const profileDropdown = document.getElementById('profileDropdown');
+      
+      if (profileIcon && profileDropdown) {
+        profileIcon.addEventListener('click', (e) => {
+          e.stopPropagation();
+          profileDropdown.style.display = profileDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        // Close dropdown on outside click
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.profile-menu')) {
+            profileDropdown.style.display = 'none';
+          }
+        });
+      }
+    }
+
+    // Notification Function
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        z-index: 2000;
+        max-width: 300px;
+        animation: slideIn 0.3s ease-out;
+      `;
+      
+      const colors = {
+        success: '#28a745',
+        error: '#dc3545',
+        warning: '#ffc107',
+        info: '#17a2b8'
+      };
+      
+      notification.style.background = colors[type] || colors.info;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 5000);
+    }
+  </script>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-about">
+        <h3>Smart Surplus Food</h3>
+        <p>
+          Empowering communities to reduce food waste and fight hunger through smart surplus management. Join us in making a sustainable impact.
+        </p>
+      </div>
+      <div class="footer-links">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="analytics.html">Impact</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-contact">
+        <h4>Contact Us</h4>
+        <p>Email: <a href="mailto:sankhadeep.satra.cse28@heritageit.edu.in">sankhadeep.satra.cse28@heritageit.edu.in</a></p>
+        <p>Phone: +91 8670203075</p>
+        <p>Address:<br>Heritage Institute of Technology<br>Chowbaga Road, Anandapur<br>PO:East Kolkata Township, Kolkata 700 107</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Smart Surplus. All rights reserved.</p>
+      <p><a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms of Use</a></p>
+    </div>
+  </footer>
+</body>
+</html>

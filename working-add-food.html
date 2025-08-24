@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add Food - Smart Surplus Food</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem 2.5rem;
+      max-width: 500px;
+      width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .auth-status {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .auth-status.logged-in {
+      background: #d4edda;
+      border-color: #c3e6cb;
+      color: #155724;
+    }
+    
+    .auth-status.not-logged-in {
+      background: #f8d7da;
+      border-color: #f5c6cb;
+      color: #721c24;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #49b47b;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .login-section, .food-form-section {
+      margin-bottom: 2rem;
+    }
+
+    .login-section input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: #49b47b;
+      box-shadow: 0 0 5px rgba(73, 180, 123, 0.3);
+    }
+
+    button {
+      width: 100%;
+      background: #49b47b;
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin: 0.5rem 0;
+    }
+
+    button:hover {
+      background: #3d875f;
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      border-left: 4px solid #28a745;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      border-left: 4px solid #dc3545;
+    }
+
+    .info {
+      background: #d1ecf1;
+      color: #0c5460;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      border-left: 4px solid #17a2b8;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .back-link a {
+      color: #49b47b;
+      text-decoration: none;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍽️ Add Surplus Food</h1>
+    
+    <!-- Authentication Status -->
+    <div id="authStatus" class="auth-status not-logged-in">
+      <strong>Status:</strong> Not logged in
+    </div>
+
+    <!-- Login Section -->
+    <div id="loginSection" class="login-section">
+      <h3>Login Required</h3>
+      <div class="form-group">
+        <input type="email" id="loginEmail" placeholder="Email (donor@test.com)" value="donor@test.com" />
+        <input type="password" id="loginPassword" placeholder="Password (donor123)" value="donor123" />
+        <button id="loginBtn" onclick="handleLogin()">Login as Donor</button>
+      </div>
+      <div class="info">
+        <strong>Test Accounts:</strong><br>
+        • Donor: donor@test.com / donor123<br>
+        • Admin: admin@smartsurplus.com / admin123
+      </div>
+    </div>
+
+    <!-- Food Form Section -->
+    <div id="foodFormSection" class="food-form-section hidden">
+      <form id="addFoodForm" onsubmit="handleAddFood(event)">
+        <div class="form-group">
+          <label>Food Name *</label>
+          <input type="text" id="foodName" required placeholder="e.g., Fresh Pizza, Biryani" />
+        </div>
+        
+        <div class="form-group">
+          <label>Food Type *</label>
+          <input type="text" id="foodType" required placeholder="e.g., Italian, Rice, Vegetables" />
+        </div>
+        
+        <div class="form-group">
+          <label>Quantity (kg) *</label>
+          <input type="number" id="foodQuantity" required min="0.1" step="0.1" placeholder="2.5" />
+        </div>
+        
+        <div class="form-group">
+          <label>Freshness Status *</label>
+          <input type="text" id="foodFreshness" required placeholder="e.g., Fresh, Good, Best Before" />
+        </div>
+        
+        <div class="form-group">
+          <label>Available Until *</label>
+          <input type="datetime-local" id="foodExpiry" required />
+        </div>
+        
+        <div class="form-group">
+          <label>Pickup Location *</label>
+          <input type="text" id="foodLocation" required placeholder="e.g., Campus Cafeteria, Room 101" />
+        </div>
+        
+        <div class="form-group">
+          <label>Safe for (hours) *</label>
+          <input type="number" id="foodSafeHours" required min="1" value="24" placeholder="24" />
+        </div>
+        
+        <div class="form-group">
+          <label>Upload Photo</label>
+          <input type="file" id="foodImage" accept="image/*" />
+        </div>
+        
+        <button type="submit" id="submitBtn">🍽️ Add Food Item</button>
+      </form>
+    </div>
+
+    <!-- Messages -->
+    <div id="messages"></div>
+
+    <div class="back-link">
+      <a href="index.html">← Back to Homepage</a>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:5000/api';
+    let currentToken = null;
+    let currentUser = null;
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🚀 Working Add Food Page loaded');
+      
+      // Set default expiry to tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(12, 0, 0, 0); // Set to noon tomorrow
+      document.getElementById('foodExpiry').value = tomorrow.toISOString().slice(0, 16);
+      
+      // Check if already logged in
+      checkExistingAuth();
+    });
+
+    function addMessage(message, type = 'info') {
+      const messagesDiv = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.className = type;
+      div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+      messagesDiv.appendChild(div);
+      console.log(`[${type.toUpperCase()}] ${message}`);
+      
+      // Auto-remove success messages after 5 seconds
+      if (type === 'success') {
+        setTimeout(() => {
+          if (div.parentNode) div.remove();
+        }, 5000);
+      }
+    }
+
+    function updateAuthStatus(loggedIn = false, user = null) {
+      const statusDiv = document.getElementById('authStatus');
+      const loginSection = document.getElementById('loginSection');
+      const foodFormSection = document.getElementById('foodFormSection');
+      
+      if (loggedIn && user) {
+        statusDiv.className = 'auth-status logged-in';
+        statusDiv.innerHTML = `
+          <strong>✅ Logged in as:</strong> ${user.name} (${user.role})<br>
+          <small>Ready to add food items!</small>
+        `;
+        loginSection.classList.add('hidden');
+        foodFormSection.classList.remove('hidden');
+      } else {
+        statusDiv.className = 'auth-status not-logged-in';
+        statusDiv.innerHTML = '<strong>❌ Status:</strong> Please login to add food items';
+        loginSection.classList.remove('hidden');
+        foodFormSection.classList.add('hidden');
+      }
+    }
+
+    function checkExistingAuth() {
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+      const name = localStorage.getItem('name');
+      
+      if (token && role && name) {
+        currentToken = token;
+        currentUser = { name, role };
+        updateAuthStatus(true, currentUser);
+        addMessage('Found existing login session', 'success');
+      } else {
+        updateAuthStatus(false);
+      }
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const loginBtn = document.getElementById('loginBtn');
+      
+      if (!email || !password) {
+        addMessage('Please enter email and password', 'error');
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Logging in...';
+      
+      try {
+        addMessage('Attempting login...', 'info');
+        
+        const response = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok && data.token && data.user) {
+          // Save authentication data
+          currentToken = data.token;
+          currentUser = {
+            name: data.user.name,
+            role: data.user.role,
+            email: data.user.email
+          };
+          
+          // Save to localStorage
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('role', data.user.role.toLowerCase());
+          localStorage.setItem('name', data.user.name);
+          
+          addMessage(`Welcome ${data.user.name}! You can now add food items.`, 'success');
+          updateAuthStatus(true, currentUser);
+          
+        } else {
+          throw new Error(data.message || 'Login failed');
+        }
+        
+      } catch (error) {
+        addMessage(`Login failed: ${error.message}`, 'error');
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login as Donor';
+      }
+    }
+
+    async function handleAddFood(event) {
+      event.preventDefault();
+      
+      if (!currentToken) {
+        addMessage('Please login first', 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitBtn');
+      const originalText = submitBtn.textContent;
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Adding Food...';
+      
+      // Fresh token verification for each submission
+      console.log('🔍 Verifying token before submission...');
+      const freshToken = localStorage.getItem('token');
+      if (!freshToken || freshToken !== currentToken) {
+        console.log('⚠️ Token mismatch detected, refreshing...');
+        currentToken = freshToken;
+      }
+      
+      try {
+        // Prepare form data
+        const formData = new FormData();
+        formData.append('name', document.getElementById('foodName').value.trim());
+        formData.append('type', document.getElementById('foodType').value.trim());
+        formData.append('quantity', document.getElementById('foodQuantity').value);
+        formData.append('freshnessStatus', document.getElementById('foodFreshness').value.trim());
+        formData.append('availableUntil', document.getElementById('foodExpiry').value);
+        formData.append('location', document.getElementById('foodLocation').value.trim());
+        formData.append('safeForHours', document.getElementById('foodSafeHours').value);
+        
+        // Add image if selected
+        const imageFile = document.getElementById('foodImage').files[0];
+        if (imageFile) {
+          formData.append('image', imageFile);
+          addMessage(`Uploading image: ${imageFile.name}`, 'info');
+        }
+
+        addMessage('Submitting food item to server...', 'info');
+
+        const response = await fetch(`${API_BASE}/food`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${currentToken}`
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          addMessage(`✅ Success! Food item "${data.name}" added successfully!`, 'success');
+          
+          // Complete form reset
+          resetFormCompletely();
+          
+          // Show success options without redirect
+          setTimeout(() => {
+            const goToHomepage = confirm('Food added successfully! 🎉\n\nWould you like to:\n✅ Yes - Go to homepage to see your food\n❌ No - Stay here to add more food');
+            if (goToHomepage) {
+              window.location.href = 'index.html';
+            } else {
+              addMessage('Ready to add another food item! 🍽️', 'info');
+            }
+          }, 1500);
+          
+        } else {
+          throw new Error(data.message || `Server error: ${response.status}`);
+        }
+        
+      } catch (error) {
+        addMessage(`Failed to add food: ${error.message}`, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    }
+
+    // Complete form reset function
+    function resetFormCompletely() {
+      console.log('🔄 Performing complete form reset...');
+      
+      // Reset the form
+      document.getElementById('addFoodForm').reset();
+      
+      // Clear all input values manually
+      document.getElementById('foodName').value = '';
+      document.getElementById('foodType').value = '';
+      document.getElementById('foodQuantity').value = '';
+      document.getElementById('foodFreshness').value = '';
+      document.getElementById('foodLocation').value = '';
+      document.getElementById('foodSafeHours').value = '24';
+      document.getElementById('foodImage').value = '';
+      
+      // Reset expiry to tomorrow (fresh date)
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(12, 0, 0, 0);
+      document.getElementById('foodExpiry').value = tomorrow.toISOString().slice(0, 16);
+      
+      // Clear any form validation states
+      const formInputs = document.querySelectorAll('#addFoodForm input');
+      formInputs.forEach(input => {
+        input.classList.remove('error', 'success');
+        input.style.borderColor = '';
+      });
+      
+      // Clear old messages after a delay
+      setTimeout(() => {
+        const oldMessages = document.querySelectorAll('#messages .success');
+        oldMessages.forEach(msg => {
+          if (msg.parentNode) msg.remove();
+        });
+      }, 3000);
+      
+      console.log('✅ Form reset complete - ready for next food item');
+    }
+
+    // Helper function to logout
+    function logout() {
+      currentToken = null;
+      currentUser = null;
+      localStorage.clear();
+      updateAuthStatus(false);
+      addMessage('Logged out successfully', 'info');
+    }
+  </script>
+</body>
+</html>

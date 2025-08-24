@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Surplus Food</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Updated card styles for food list with 3 cards per row */
+    .food-list-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      justify-content: center;
+      margin-bottom: 48px;
+    }
+
+    .food-card {
+      flex: 1 1 calc(33.333% - 32px); /* 3 cards per row */
+      max-width: 340px; /* optional */
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 4px 22px rgba(0,0,0,0.11);
+      padding: 0 0 16px;
+      margin: 12px 0;
+      transition: box-shadow 0.2s;
+    }
+    .food-card:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .food-card-header {
+      padding: 12px 16px 0 16px;
+      display: flex;
+      gap: 8px;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.8em;
+      padding: 2px 10px;
+      border-radius: 12px;
+      color: #fff;
+    }
+    .tag.new { background: #f6a622; }
+    .tag.veg { background: #3db94a; }
+    .tag.fruit { background: #e97451; }
+    .tag.salad { background: #59c352; }
+    
+    .food-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px 10px 0 0;
+    }
+    .food-card-body {
+      padding: 14px 18px 8px 18px;
+      flex: 1 1 auto;
+    }
+    .food-title {
+      margin: 5px 0 8px 0;
+      font-size: 1.3em;
+    }
+    .food-desc {
+      color: #696969;
+      font-size: 1em;
+      margin-bottom: 8px;
+    }
+    .food-meta {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0 0;
+      font-size: 0.98em;
+      color: #444;
+    }
+    .food-meta li {
+      margin-bottom: 2px;
+      line-height: 1.3;
+    }
+    .food-card-footer {
+      padding: 0 18px 0 18px;
+    }
+    .reserve-btn {
+      width: 100%;
+      margin-top: 14px;
+      padding: 10px 0;
+      border: none;
+      background: #24af63;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .reserve-btn:hover {
+      background: #178f4e;
+    }
+
+    /* Profile Menu Styles */
+    .profile-menu {
+      position: relative;
+      display: inline-block;
+    }
+    
+    #profileIcon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #49b47b;
+      object-fit: cover;
+      transition: transform 0.2s ease;
+    }
+    
+    #profileIcon:hover {
+      transform: scale(1.1);
+      border-color: #3d875f;
+    }
+    
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      z-index: 1000;
+      border: 1px solid #ddd;
+    }
+    
+    .dropdown-content a {
+      color: #333;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.2s;
+    }
+    
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+    
+    .dropdown-content a:first-child {
+      border-radius: 8px 8px 0 0;
+    }
+    
+    .dropdown-content a:last-child {
+      border-radius: 0 0 8px 8px;
+    }
+    
+    /* User welcome text */
+    .user-welcome {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    /* Responsive breakpoints */
+    @media (max-width: 1100px) {
+      .food-card {
+        flex: 1 1 calc(50% - 32px); /* 2 cards per row */
+      }
+    }
+    @media (max-width: 700px) {
+      .food-card {
+        flex: 1 1 100%; /* 1 card per row */
+      }
+    }
+    
+    /* Animations for welcome message */
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <!-- Navigation Bar -->
+  <nav>
+    <div class="nav-left">
+      <span class="nav-brand">Smart Surplus</span>
+      <a href="index.html">Home</a>
+      <a href="events.html">Events</a>
+      <a href="analytics.html">Impact</a>
+    </div>
+    <div class="nav-right" id="navbarUser">
+      <span id="authButtons">
+        <a href="login.html">User Login</a> | 
+        <!--<a href="admin-login.html" class="hero-btn donate">Donar login</a>-->
+      </span>
+      <div id="profileMenu" class="profile-menu" style="display:none;">
+        <img id="profileIcon" src="images/default-avatar.svg" alt="Profile" />
+        <div id="profileDropdown" class="dropdown-content">
+          <a href="edit-profile.html">Edit Profile</a>
+          <a href="#" id="logoutLink">Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>Reduce Waste, Serve More.<br>Smart Surplus Food Initiative</h1>
+    <p>
+      List, find, and distribute surplus food across campus. Save meals, reduce environmental impact, and foster a connected community.
+    </p>
+    <div class="hero-buttons">
+      <button class="hero-btn find">Find Food Near You</button>
+      <a href="login.html" class="hero-btn donate">Donate Surplus Food</a>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <section id="stats">
+    <div class="stat-card"><h2 id="foodSaved">0 kg</h2><p>Food Saved</p></div>
+    <div class="stat-card"><h2 id="peopleServed">0</h2><p>People Served</p></div>
+    <div class="stat-card"><h2 id="carbonSaved">0 kg CO₂</h2><p>Carbon Saved</p></div>
+  </section>
+
+  <!-- Available Surplus Food Section -->
+  <h1 class="section-title">Available Surplus Food</h1>
+  <div id="foodList" class="food-list-container"> 
+    <!-- Food cards will be dynamically inserted here -->
+  </div>
+
+  
+
+  <script>
+    // Load dynamic food data from backend API
+    async function loadFoodFromAPI() {
+      const API_URL = "http://localhost:5000/api";
+      const BASE_URL = "http://localhost:5000";
+      const foodListEl = document.getElementById('foodList');
+      
+      try {
+        foodListEl.innerHTML = '<p style="text-align:center; color:#666;">Loading available food...</p>';
+        
+        const response = await fetch(`${API_URL}/food`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch food data');
+        }
+        
+        const foods = await response.json();
+        
+        if (foods.length === 0) {
+          foodListEl.innerHTML = '<p style="text-align:center; color:#999;">No surplus food available at the moment. Check back later!</p>';
+          return;
+        }
+        
+        // Render food cards with real data from backend
+        foodListEl.innerHTML = foods.map(food => `
+          <div class="food-card">
+            <div class="food-card-header">
+              <span class="tag new">Fresh</span>
+              <span class="tag veg">${food.type || 'Food'}</span>
+            </div>
+            <img src="${food.imageUrl ? BASE_URL + food.imageUrl : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop&crop=food&q=80'}" 
+                 alt="${food.name}" class="food-image" 
+                 onload="console.log('✅ Image loaded: ${food.name}');"
+                 onerror="console.log('❌ Image failed for ${food.name}, trying fallback'); this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop&crop=food&q=80'; this.onerror=function(){this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPic;}"/>
+            <div class="food-card-body">
+              <h2 class="food-title">${food.name}</h2>
+              <p class="food-desc">Fresh ${food.type} - ${food.freshnessStatus}</p>
+              <ul class="food-meta">
+                <li><strong>Location:</strong> ${food.location}</li>
+                <li><strong>Quantity:</strong> ${food.quantity} kg</li>
+                <li><strong>Expires:</strong> ${new Date(food.availableUntil).toLocaleDateString()} ${new Date(food.availableUntil).toLocaleTimeString()}</li>
+                <li><strong>Safe for:</strong> ${food.safeForHours} hours</li>
+                <li><strong>Added:</strong> ${new Date(food.createdAt).toLocaleDateString()}</li>
+              </ul>
+            </div>
+            <div class="food-card-footer">
+              <button class="reserve-btn" onclick="reserveFood('${food._id}', '${food.name.replace(/'/g, "\\'")}')"
+                      ${food.quantity <= 0 ? 'disabled style="background: #ccc; cursor: not-allowed;"' : ''}>
+                ${food.quantity <= 0 ? '❌ Unavailable' : '🍽️ Reserve This Food'}
+              </button>
+            </div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        console.error('Error loading food:', error);
+        foodListEl.innerHTML = '<p style="text-align:center; color:red;">Failed to load food items. Please try again later.</p>';
+      }
+    }
+    
+    // Enhanced food reservation with proper backend integration
+    async function reserveFood(foodId, foodName) {
+      console.log('🍽️ ReserveFood called for:', foodName, 'ID:', foodId);
+      
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+      const name = localStorage.getItem('name');
+      
+      console.log('🔍 Authentication check:');
+      console.log('  Token:', token ? 'Present' : 'Missing');
+      console.log('  Role:', role);
+      console.log('  Name:', name);
+      
+      if (!token || !role || !name) {
+        console.log('❌ Authentication missing, redirecting to login');
+        alert('🔑 Please login first to reserve food!');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      if (role === 'donor' || role === 'admin') {
+        console.log('⚠️ User is donor/admin, redirecting to dashboard');
+        alert('📝 Donors cannot reserve food. Please use the donor dashboard instead.');
+        window.location.href = 'bulletproof-add-food.html';
+        return;
+      }
+      
+      console.log('✅ Authentication OK, proceeding with reservation');
+      
+      // Verify token is still valid before making reservation
+      try {
+        const verifyResponse = await fetch('http://localhost:5000/api/auth/verify', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!verifyResponse.ok) {
+          console.log('❌ Token verification failed, redirecting to login');
+          localStorage.clear();
+          alert('🔑 Your session has expired. Please login again.');
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        console.log('✅ Token verified successfully');
+      } catch (error) {
+        console.error('❌ Token verification error:', error);
+        alert('❌ Network error. Please check your connection and try again.');
+        return;
+      }
+      
+      // Show reservation modal
+      const quantity = prompt(`How many kg of "${foodName}" would you like to reserve?\n\nEnter quantity:`, '1.0');
+      if (!quantity || quantity <= 0) {
+        return;
+      }
+      
+      const message = prompt('Optional: Add a message for the donor:', 'I would like to reserve this food item. Thank you!');
+      
+      try {
+        const API_URL = 'http://localhost:5000/api';
+        
+        const response = await fetch(`${API_URL}/reservations`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            foodItemId: foodId,
+            quantityRequested: parseFloat(quantity),
+            message: message
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert(`✅ Success!\n\nYour reservation request for ${quantity}kg of "${foodName}" has been sent to the donor!\n\nYou'll receive an email notification once the donor responds.`);
+          
+          // Refresh food list to show updated quantities
+          loadFoodFromAPI();
+          
+          // Update user's reservations if profile is visible
+          if (document.getElementById('userReservations')) {
+            loadUserReservations();
+          }
+        } else {
+          alert(`❌ Error: ${data.message}`);
+        }
+        
+      } catch (error) {
+        console.error('Reservation error:', error);
+        alert('❌ Failed to send reservation request. Please try again.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadFoodFromAPI();
+    });
+  </script>
+
+  <!-- Socket.io for real-time notifications -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="js/socket.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Load stats from API
+    async function loadStats() {
+      try {
+        const res = await fetch('http://localhost:5000/api/analytics/stats');
+        const data = await res.json();
+        document.getElementById('foodSaved').textContent = data.foodSaved + ' kg';
+        document.getElementById('peopleServed').textContent = data.peopleServed;
+        document.getElementById('carbonSaved').textContent = data.carbonSaved + ' kg CO₂';
+      } catch (error) {
+        console.error('Failed to load stats:', error);
+        // Set default values if API fails
+        document.getElementById('foodSaved').textContent = '0 kg';
+        document.getElementById('peopleServed').textContent = '0';
+        document.getElementById('carbonSaved').textContent = '0 kg CO₂';
+      }
+    }
+    
+    // Initialize stats on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadStats();
+    });
+  </script>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-about">
+        <h3>Smart Surplus Food</h3>
+        <p>
+          Empowering communities to reduce food waste and fight hunger through smart surplus management. Join us in making a sustainable impact.
+        </p>
+      </div>
+      <div class="footer-links">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="analytics.html">Impact</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-contact">
+        <h4>Contact Us</h4>
+        <p>Email<br>: <a href="sankhadeep.satra.cse28@heritageit.edu.in">sankhadeep.satra.cse28@heritageit.edu.in</a></p>
+       
+        <p>Phone: +91 8670203075</p>
+        
+        <p>Address:
+Heritage Institute of Technology
+Chowbaga Road, Anandapur
+PO:East Kolkata Township, Kolkata 700 107</p>
+      </div>
+      <div class="footer-social">
+        <h4>Follow Us</h4>
+        <a href="#" aria-label="Facebook"><img src="https://tse3.mm.bing.net/th/id/OIP.RL4czXDzNVgIjHV1bDMd0wHaHa?w=1000&h=1000&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Facebook" /></a>
+        <a href="#" aria-label="Twitter"><img src="https://static.vecteezy.com/system/resources/previews/027/395/710/original/twitter-brand-new-logo-3-d-with-new-x-shaped-graphic-of-the-world-s-most-popular-social-media-free-png.png" alt="Twitter" /></a>
+        <a href="#" aria-label="Instagram"><img src="https://tse4.mm.bing.net/th/id/OIP.9GePYPo_rTpZpV-6GpETQAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Instagram" /></a>
+        <a href="#" aria-label="LinkedIn"><img src="https://logospng.org/download/linkedin/logo-linkedin-icon-1536.png" alt="LinkedIn" /></a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Smart Surplus. All rights reserved.</p>
+      <p><a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms of Use</a></p>
+    </div>
+  </footer>
+</body>
+</html>

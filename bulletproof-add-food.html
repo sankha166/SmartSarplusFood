@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🎛️ Enhanced Donor Dashboard - Smart Surplus Food</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; padding: 1rem; min-height: 100vh; color: #333;
+    }
+    .main-container {
+      max-width: 1200px; margin: 0 auto;
+    }
+    .container {
+      background: white; padding: 2rem; margin-bottom: 2rem;
+      border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .status { padding: 1rem; margin-bottom: 1.5rem; border-radius: 8px; font-size: 0.9rem; }
+    .status.logged-in { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+    .status.not-logged-in { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+    h1, h2, h3 { color: #49b47b; margin-bottom: 1rem; }
+    h1 { text-align: center; font-size: 2rem; font-weight: 700; }
+    h2 { font-size: 1.5rem; border-bottom: 2px solid #49b47b; padding-bottom: 0.5rem; }
+    h3 { font-size: 1.2rem; }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555; }
+    .form-group input, .form-group textarea { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #49b47b; box-shadow: 0 0 5px rgba(73, 180, 123, 0.3); }
+    button { background: #49b47b; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; 
+             font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; margin: 0.25rem; }
+    button:hover { background: #3d875f; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    button.secondary { background: #6c757d; }
+    button.secondary:hover { background: #5a6268; }
+    button.danger { background: #dc3545; }
+    button.danger:hover { background: #c82333; }
+    .hidden { display: none; }
+    .success { background: #d4edda; color: #155724; padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #28a745; }
+    .error { background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #dc3545; }
+    .info { background: #d1ecf1; color: #0c5460; padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #17a2b8; }
+    .warning { background: #fff3cd; color: #856404; padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #ffc107; }
+    .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 2rem; }
+    .tab { padding: 1rem 2rem; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s; }
+    .tab.active { border-bottom-color: #49b47b; background: #f8f9fa; font-weight: 600; }
+    .tab:hover { background: #f1f3f4; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: linear-gradient(135deg, #49b47b, #3d875f); color: white; padding: 1.5rem; border-radius: 12px; text-align: center; }
+    .stat-card h3 { margin: 0 0 0.5rem 0; font-size: 2rem; }
+    .stat-card p { margin: 0; opacity: 0.9; }
+    .food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+    .food-item { background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; transition: box-shadow 0.3s; }
+    .food-item:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .food-item img { width: 100%; height: 150px; object-fit: cover; border-radius: 6px; margin-bottom: 1rem; }
+    .food-item h4 { margin: 0 0 0.5rem 0; color: #333; }
+    .food-item p { margin: 0.25rem 0; color: #666; font-size: 0.9rem; }
+    .food-controls { margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .food-controls button { font-size: 0.8rem; padding: 0.4rem 0.8rem; }
+    .requests-list { max-height: 400px; overflow-y: auto; }
+    .request-item { background: #f8f9fa; border-left: 4px solid #49b47b; padding: 1rem; margin-bottom: 1rem; border-radius: 4px; }
+    .request-item.pending { border-left-color: #ffc107; }
+    .request-item.approved { border-left-color: #28a745; }
+    .request-item.rejected { border-left-color: #dc3545; }
+    .quantity-input { width: 80px; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px; }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .user-info { display: flex; align-items: center; gap: 1rem; }
+    .user-info span { font-weight: 600; color: #49b47b; }
+    .tab-actions { margin-bottom: 1rem; }
+    .badge { background: #dc3545; color: white; border-radius: 50%; padding: 0.2rem 0.5rem; font-size: 0.8rem; font-weight: bold; margin-left: 0.5rem; }
+    .notification-sound { position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 1rem; border-radius: 8px; 
+                         box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideIn 0.3s ease-out; z-index: 1000; }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    .flash-notification { animation: flash 2s ease-in-out infinite; }
+    @keyframes flash { 0%, 50%, 100% { opacity: 1; } 25%, 75% { opacity: 0.5; } }
+    .request-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .request-actions button { font-size: 0.8rem; padding: 0.4rem 0.8rem; }
+    .request-details { display: grid; gap: 0.5rem; margin: 0.5rem 0; }
+    .request-details p { margin: 0; font-size: 0.9rem; }
+    .urgent { border-left-color: #dc3545 !important; background: linear-gradient(135deg, #ffe6e6, #ffcccc); }
+    .approve-btn { background: #28a745; } .approve-btn:hover { background: #1e7e34; }
+    .reject-btn { background: #dc3545; } .reject-btn:hover { background: #c82333; }
+    .completed { opacity: 0.7; border-left-color: #6c757d; }
+  </style>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="dashboard-header">
+      <h1>🎛️ Donor Dashboard</h1>
+      <div id="userInfo" class="user-info hidden">
+        <span id="welcomeText">Welcome back!</span>
+        <button id="logoutBtn" onclick="performLogout()" class="secondary">🚪 Logout</button>
+      </div>
+    </div>
+    
+    <div id="authStatus" class="status not-logged-in">
+      <!--<strong>Status:</strong> Checking authentication...-->
+    </div>
+
+    <!-- Login Section -->
+    <div id="loginSection">
+      <h3>🔑 Login Required</h3>
+      <div class="form-group">
+        <input type="email" id="loginEmail" value="donor@test.com" placeholder="Email" />
+        <input type="password" id="loginPassword" value="donor123" placeholder="Password" />
+        <button id="loginBtn" onclick="performLogin()">🔑 Login as Donor</button>
+      </div>
+    </div>
+
+    <!-- Dashboard Tabs -->
+    <div id="dashboardSection" class="hidden">
+      <div class="tabs">
+        <div class="tab active" data-tab="dashboard">📊 Dashboard</div>
+        <div class="tab" data-tab="add-food">➕ Add Food</div>
+        <div class="tab" data-tab="my-food">🍽️ My Food Items</div>
+        <div class="tab" data-tab="requests">📨 Live Requests <span id="requestBadge" class="badge hidden">0</span></div>
+      </div>
+      
+      <!-- Dashboard Summary Tab -->
+      <div class="tab-content active" id="dashboard-content">
+        <h2>📊 Dashboard Summary</h2>
+        <div id="dashboardStats" class="stats-grid">
+          <div class="stat-card">
+            <h3 id="totalFoodItems">0</h3>
+            <p>Total Food Items</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="activeFoodItems">0</h3>
+            <p>Active Items</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="pendingRequests">0</h3>
+            <p>Pending Requests</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="totalDonated">0</h3>
+            <p>kg Donated</p>
+          </div>
+        </div>
+        <div class="info">
+          <h4>🎯 Quick Actions</h4>
+          <p>Use the tabs above to add new food items, manage existing ones, or respond to recipient requests!</p>
+        </div>
+      </div>
+      
+      <!-- Add Food Tab -->
+      <div class="tab-content" id="add-food-content">
+        <h2>➕ Add New Food Item</h2>
+        <form id="foodForm" onsubmit="addFood(event)">
+          <div class="form-group">
+            <label>Food Name *</label>
+            <input type="text" id="foodName" required placeholder="e.g., Fresh Pizza" />
+          </div>
+          <div class="form-group">
+            <label>Food Type *</label>
+            <input type="text" id="foodType" required placeholder="e.g., Italian Food" />
+          </div>
+          <div class="form-group">
+            <label>Quantity (kg) *</label>
+            <input type="number" id="foodQuantity" required min="0.1" step="0.1" placeholder="2.5" />
+          </div>
+          <div class="form-group">
+            <label>Freshness Status *</label>
+            <input type="text" id="foodFreshness" required placeholder="Fresh" />
+          </div>
+          <div class="form-group">
+            <label>Available Until *</label>
+            <input type="datetime-local" id="foodExpiry" required />
+          </div>
+          <div class="form-group">
+            <label>Pickup Location *</label>
+            <input type="text" id="foodLocation" required placeholder="Campus Cafeteria" />
+          </div>
+          <div class="form-group">
+            <label>Safe for (hours) *</label>
+            <input type="number" id="foodSafeHours" required min="1" value="24" />
+          </div>
+          <div class="form-group">
+            <label>Upload Photo</label>
+            <input type="file" id="foodImage" accept="image/*" />
+          </div>
+          <button type="submit" id="submitBtn">🍽️ Add Food Item</button>
+        </form>
+      </div>
+      
+      <!-- My Food Items Tab -->
+      <div class="tab-content" id="my-food-content">
+        <h2>🍽️ My Food Items</h2>
+        <div class="tab-actions">
+          <button onclick="refreshMyFood()" class="secondary">🔄 Refresh</button>
+        </div>
+        <div id="myFoodGrid" class="food-grid">
+          <div class="info">Loading your food items...</div>
+        </div>
+      </div>
+      
+      <!-- Live Requests Tab -->
+      <div class="tab-content" id="requests-content">
+        <h2>📨 Live Food Requests</h2>
+        <div class="tab-actions">
+          <button onclick="refreshRequests()" class="secondary">🔄 Refresh</button>
+          <button onclick="toggleNotificationSound()" id="soundToggle" class="secondary">🔊 Sound: ON</button>
+        </div>
+        <div id="requestsList" class="requests-list">
+          <div class="info">Loading your food requests...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="messages"></div>
+    
+    <div style="text-align: center; margin-top: 1rem;">
+      <a href="index.html" style="color: #49b47b;">← Back to Homepage</a>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:5000/api';
+    let userToken = null;
+    let userData = null;
+    let socket = null;
+    let notificationSoundEnabled = true;
+    let refreshInterval = null;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🎛️ Enhanced Donor Dashboard loaded');
+      setDefaultExpiry();
+      setupTabSwitching();
+      checkLogin();
+      setupSocketConnection();
+    });
+
+    function setDefaultExpiry() {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(12, 0, 0, 0);
+      document.getElementById('foodExpiry').value = tomorrow.toISOString().slice(0, 16);
+    }
+
+    function addMessage(msg, type = 'info') {
+      const div = document.createElement('div');
+      div.className = type;
+      div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${msg}`;
+      document.getElementById('messages').appendChild(div);
+      console.log(`[${type.toUpperCase()}] ${msg}`);
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => { if (div.parentNode) div.remove(); }, 5000);
+    }
+
+    function updateUI(loggedIn, user = null) {
+      const status = document.getElementById('authStatus');
+      const loginSection = document.getElementById('loginSection');
+      const dashboardSection = document.getElementById('dashboardSection');
+      const userInfo = document.getElementById('userInfo');
+      
+      console.log('🎛️ Donor Dashboard - UpdateUI called:');
+      console.log('  Logged in:', loggedIn);
+      console.log('  User:', user);
+      
+      if (loggedIn && user) {
+        // Check if user is authorized for donor dashboard
+        const userRole = user.role.toLowerCase();
+        if (userRole !== 'donor' && userRole !== 'admin') {
+          console.log('⚠️ User is not donor/admin, redirecting to home');
+          status.className = 'status not-logged-in';
+          status.innerHTML = '<strong>❌ Access Denied:</strong> Donor dashboard is only for donors and admins. <a href="index.html">Go to Home</a>';
+          loginSection.classList.add('hidden');
+          dashboardSection.classList.add('hidden');
+          userInfo.classList.add('hidden');
+          return;
+        }
+        
+        console.log('✅ Authorized donor/admin access');
+        status.className = 'status logged-in';
+        status.innerHTML = `<strong>✅ Logged in:</strong> ${user.name} (${user.role})`;
+        loginSection.classList.add('hidden');
+        dashboardSection.classList.remove('hidden');
+        userInfo.classList.remove('hidden');
+        
+        const welcomeText = document.getElementById('welcomeText');
+        if (welcomeText) {
+          welcomeText.textContent = `Welcome, ${user.name}!`;
+        }
+        
+        // Load dashboard data
+        setTimeout(() => {
+          loadDashboardSummary();
+          loadMyFoodItems();
+          loadLiveRequests();
+        }, 500);
+        
+        // Start auto-refresh
+        startAutoRefresh();
+      } else {
+        console.log('❌ No user or not logged in');
+        status.className = 'status not-logged-in';
+        status.innerHTML = '<strong>❌ Please login as donor/admin to access this dashboard</strong>';
+        loginSection.classList.remove('hidden');
+        dashboardSection.classList.add('hidden');
+        userInfo.classList.add('hidden');
+        
+        // Stop auto-refresh
+        stopAutoRefresh();
+      }
+    }
+
+    async function checkLogin() {
+      console.log('🔍 Checking login status...');
+      const token = localStorage.getItem('token');
+      const storedRole = localStorage.getItem('role');
+      const storedName = localStorage.getItem('name');
+      
+      console.log('Token:', token ? 'Present' : 'Missing');
+      console.log('Stored role:', storedRole);
+      console.log('Stored name:', storedName);
+      
+      if (!token) {
+        console.log('❌ No token found, showing login');
+        updateUI(false);
+        return;
+      }
+
+      try {
+        console.log('🔍 Verifying token with server...');
+        const response = await fetch(`${API_BASE}/auth/verify`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ Token verified, user data:', data.user);
+          
+          userToken = token;
+          userData = data.user;
+          
+          // Update localStorage with fresh data
+          localStorage.setItem('role', data.user.role.toLowerCase());
+          localStorage.setItem('name', data.user.name);
+          
+          updateUI(true, data.user);
+          addMessage(`Welcome back, ${data.user.name}!`, 'success');
+        } else {
+          throw new Error(`Token verification failed with status: ${response.status}`);
+        }
+      } catch (error) {
+        console.warn('⚠️ Token verification failed:', error.message);
+        
+        // Try to use stored data if available (offline mode)
+        if (storedRole && storedName) {
+          console.log('📦 Using stored credentials as fallback');
+          const fallbackUser = { role: storedRole, name: storedName };
+          userData = fallbackUser;
+          userToken = token;
+          updateUI(true, fallbackUser);
+          addMessage('Using cached login (limited functionality)', 'warning');
+        } else {
+          console.log('🗑️ Clearing invalid credentials');
+          localStorage.clear();
+          userToken = null;
+          userData = null;
+          updateUI(false);
+          addMessage('Session expired. Please login again.', 'error');
+        }
+      }
+    }
+
+    async function performLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const btn = document.getElementById('loginBtn');
+      
+      if (!email || !password) {
+        addMessage('Please enter email and password', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Logging in...';
+      
+      try {
+        addMessage('Attempting login...', 'info');
+        
+        const response = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok && data.token) {
+          userToken = data.token;
+          userData = data.user;
+          
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('role', data.user.role.toLowerCase());
+          localStorage.setItem('name', data.user.name);
+          
+          updateUI(true, data.user);
+          addMessage(`Welcome ${data.user.name}! Dashboard loaded.`, 'success');
+        } else {
+          throw new Error(data.message || 'Login failed');
+        }
+      } catch (error) {
+        addMessage(`Login failed: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔑 Login';
+      }
+    }
+
+    async function addFood(event) {
+      event.preventDefault();
+      
+      // Always get fresh token
+      const freshToken = localStorage.getItem('token');
+      if (!freshToken) {
+        addMessage('Please login first', 'error');
+        checkLogin();
+        return;
+      }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Adding Food...';
+      
+      try {
+        // Re-login if needed to get fresh token
+        if (!userToken || userToken !== freshToken) {
+          addMessage('Refreshing authentication...', 'info');
+          await performFreshLogin();
+        }
+
+        const formData = new FormData();
+        formData.append('name', document.getElementById('foodName').value.trim());
+        formData.append('type', document.getElementById('foodType').value.trim());
+        formData.append('quantity', document.getElementById('foodQuantity').value);
+        formData.append('freshnessStatus', document.getElementById('foodFreshness').value.trim());
+        formData.append('availableUntil', document.getElementById('foodExpiry').value);
+        formData.append('location', document.getElementById('foodLocation').value.trim());
+        formData.append('safeForHours', document.getElementById('foodSafeHours').value);
+        
+        const imageFile = document.getElementById('foodImage').files[0];
+        if (imageFile) {
+          formData.append('image', imageFile);
+        }
+
+        addMessage('Submitting food item...', 'info');
+
+        const response = await fetch(`${API_BASE}/food`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${userToken}` },
+          body: formData
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          addMessage(`✅ Success! "${data.name}" added successfully!`, 'success');
+          resetForm();
+          
+          // Refresh dashboard data
+          setTimeout(() => {
+            loadDashboardSummary();
+            loadMyFoodItems();
+            addMessage('Dashboard refreshed with new food item! 🍽️', 'info');
+          }, 1000);
+        } else {
+          // Token might be expired, try fresh login
+          if (response.status === 401) {
+            addMessage('Authentication expired, trying fresh login...', 'info');
+            await performFreshLogin();
+            // Retry the request
+            const retryResponse = await fetch(`${API_BASE}/food`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${userToken}` },
+              body: formData
+            });
+            const retryData = await retryResponse.json();
+            if (retryResponse.ok) {
+              addMessage(`✅ Success after retry! "${retryData.name}" added!`, 'success');
+              resetForm();
+            } else {
+              throw new Error(retryData.message || 'Failed after retry');
+            }
+          } else {
+            throw new Error(data.message || `Server error: ${response.status}`);
+          }
+        }
+        
+      } catch (error) {
+        addMessage(`Failed to add food: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🍽️ Add Food Item';
+      }
+    }
+
+    async function performFreshLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      
+      const response = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+      
+      if (response.ok && data.token) {
+        userToken = data.token;
+        userData = data.user;
+        
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.user.role.toLowerCase());
+        localStorage.setItem('name', data.user.name);
+        
+        addMessage('Authentication refreshed', 'success');
+        return data.token;
+      } else {
+        throw new Error('Fresh login failed');
+      }
+    }
+
+    function resetForm() {
+      document.getElementById('foodForm').reset();
+      document.getElementById('foodSafeHours').value = '24';
+      setDefaultExpiry();
+    }
+    
+    // Tab switching functionality
+    function setupTabSwitching() {
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const targetTab = tab.dataset.tab;
+          
+          // Remove active class from all tabs and contents
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(tc => tc.classList.remove('active'));
+          
+          // Add active class to clicked tab and corresponding content
+          tab.classList.add('active');
+          document.getElementById(`${targetTab}-content`).classList.add('active');
+          
+          // Load tab-specific data
+          if (targetTab === 'dashboard') loadDashboardSummary();
+          else if (targetTab === 'my-food') loadMyFoodItems();
+          else if (targetTab === 'requests') loadLiveRequests();
+        });
+      });
+    }
+    
+    // Dashboard summary functions
+    async function loadDashboardSummary() {
+      try {
+        const response = await fetch(`${API_BASE}/donor/dashboard-summary`, {
+          headers: { 'Authorization': `Bearer ${userToken}` }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('totalFoodItems').textContent = data.totalFoodItems;
+          document.getElementById('activeFoodItems').textContent = data.activeFoodItems;
+          document.getElementById('pendingRequests').textContent = data.pendingRequests;
+          document.getElementById('totalDonated').textContent = data.totalFoodDonated;
+          
+          // Update request badge
+          updateRequestBadge(data.pendingRequests);
+        }
+      } catch (error) {
+        console.error('Failed to load dashboard summary:', error);
+      }
+    }
+    
+    // My food items functions
+    async function loadMyFoodItems() {
+      try {
+        const response = await fetch(`${API_BASE}/donor/my-food`, {
+          headers: { 'Authorization': `Bearer ${userToken}` }
+        });
+        
+        if (response.ok) {
+          const foodItems = await response.json();
+          displayMyFoodItems(foodItems);
+        }
+      } catch (error) {
+        console.error('Failed to load my food items:', error);
+        document.getElementById('myFoodGrid').innerHTML = '<div class="error">Failed to load food items</div>';
+      }
+    }
+    
+    function displayMyFoodItems(foodItems) {
+      const grid = document.getElementById('myFoodGrid');
+      
+      if (foodItems.length === 0) {
+        grid.innerHTML = '<div class="info">No food items yet. Add some food to get started!</div>';
+        return;
+      }
+      
+      grid.innerHTML = foodItems.map(food => `
+        <div class="food-item ${food.quantity === 0 ? 'completed' : ''}">
+          <img src="${API_BASE.replace('/api', '')}${food.imageUrl}" alt="${food.name}" onerror="this.src='${API_BASE.replace('/api', '')}/uploads/default.jpg'">
+          <h4>🍽️ ${food.name}</h4>
+          <p><strong>Type:</strong> ${food.type}</p>
+          <p><strong>Quantity:</strong> ${food.quantity} kg</p>
+          <p><strong>Location:</strong> ${food.location}</p>
+          <p><strong>Available Until:</strong> ${new Date(food.availableUntil).toLocaleDateString()}</p>
+          <p><strong>Requests:</strong> ${food.stats.totalRequests} total, ${food.stats.pendingRequests} pending</p>
+          
+          <div class="food-controls">
+            <input type="number" class="quantity-input" value="${food.quantity}" min="0" step="0.1" id="qty-${food._id}">
+            <button onclick="updateQuantity('${food._id}')" class="secondary">📦 Update Qty</button>
+            <button onclick="toggleAvailability('${food._id}', ${food.quantity > 0})" class="${food.quantity > 0 ? 'danger' : 'approve-btn'}">
+              ${food.quantity > 0 ? '❌ Mark Unavailable' : '✅ Mark Available'}
+            </button>
+            <button onclick="deleteFood('${food._id}', '${food.name}')" class="danger">🗑️ Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // Food management functions
+    async function updateQuantity(foodId) {
+      const newQuantity = parseFloat(document.getElementById(`qty-${foodId}`).value);
+      
+      try {
+        const response = await fetch(`${API_BASE}/donor/food/${foodId}/quantity`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${userToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ quantity: newQuantity })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          addMessage(`✅ Updated quantity for "${data.foodItem.name}"`, 'success');
+          loadMyFoodItems();
+          loadDashboardSummary();
+        } else {
+          addMessage(data.message, 'error');
+        }
+      } catch (error) {
+        addMessage(`Failed to update quantity: ${error.message}`, 'error');
+      }
+    }
+    
+    async function toggleAvailability(foodId, currentlyAvailable) {
+      try {
+        const response = await fetch(`${API_BASE}/donor/food/${foodId}/availability`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${userToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ available: !currentlyAvailable })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          addMessage(`✅ ${data.message}`, 'success');
+          loadMyFoodItems();
+          loadDashboardSummary();
+        } else {
+          addMessage(data.message, 'error');
+        }
+      } catch (error) {
+        addMessage(`Failed to update availability: ${error.message}`, 'error');
+      }
+    }
+    
+    async function deleteFood(foodId, foodName) {
+      if (!confirm(`Are you sure you want to delete "${foodName}"?\n\nThis action cannot be undone!`)) {
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_BASE}/donor/food/${foodId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${userToken}` }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          addMessage(`✅ Deleted "${foodName}"`, 'success');
+          loadMyFoodItems();
+          loadDashboardSummary();
+        } else {
+          addMessage(data.message, 'error');
+        }
+      } catch (error) {
+        addMessage(`Failed to delete food: ${error.message}`, 'error');
+      }
+    }
+    
+    // Live requests functions
+    async function loadLiveRequests() {
+      try {
+        const response = await fetch(`${API_BASE}/reservations/donor`, {
+          headers: { 'Authorization': `Bearer ${userToken}` }
+        });
+        
+        if (response.ok) {
+          const requests = await response.json();
+          displayLiveRequests(requests);
+        }
+      } catch (error) {
+        console.error('Failed to load live requests:', error);
+        document.getElementById('requestsList').innerHTML = '<div class="error">Failed to load requests</div>';
+      }
+    }
+    
+    function displayLiveRequests(requests) {
+      const list = document.getElementById('requestsList');
+      
+      if (requests.length === 0) {
+        list.innerHTML = '<div class="info">No food requests yet. Recipients will see your food items and can request them!</div>';
+        return;
+      }
+      
+      // Sort requests - pending first, then by date
+      requests.sort((a, b) => {
+        if (a.status === 'pending' && b.status !== 'pending') return -1;
+        if (b.status === 'pending' && a.status !== 'pending') return 1;
+        return new Date(b.requestedAt) - new Date(a.requestedAt);
+      });
+      
+      list.innerHTML = requests.map(request => `
+        <div class="request-item ${request.status} ${request.status === 'pending' ? 'flash-notification' : ''}">
+          <h4>📋 Request for "${request.foodItem.name}"</h4>
+          <div class="request-details">
+            <p><strong>👤 Requester:</strong> ${request.requester.name} (${request.requester.email})</p>
+            <p><strong>📦 Quantity:</strong> ${request.quantityRequested} kg</p>
+            <p><strong>📅 Requested:</strong> ${new Date(request.requestedAt).toLocaleString()}</p>
+            <p><strong>🎯 Status:</strong> <span style="text-transform: uppercase; font-weight: bold; color: ${getStatusColor(request.status)}">${request.status}</span></p>
+            ${request.message ? `<p><strong>💬 Message:</strong> "${request.message}"</p>` : ''}
+            ${request.donorResponse ? `<p><strong>📝 Your Response:</strong> "${request.donorResponse}"</p>` : ''}
+          </div>
+          
+          ${request.status === 'pending' ? `
+            <div class="request-actions">
+              <button onclick="respondToRequest('${request._id}', 'approved')" class="approve-btn">✅ Approve</button>
+              <button onclick="respondToRequest('${request._id}', 'rejected')" class="reject-btn">❌ Reject</button>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+    
+    function getStatusColor(status) {
+      switch(status) {
+        case 'pending': return '#ffc107';
+        case 'approved': return '#28a745';
+        case 'rejected': return '#dc3545';
+        case 'completed': return '#6c757d';
+        default: return '#333';
+      }
+    }
+    
+    async function respondToRequest(requestId, status) {
+      const response = prompt(`Enter your ${status === 'approved' ? 'approval' : 'rejection'} message (optional):`);
+      
+      try {
+        const apiResponse = await fetch(`${API_BASE}/reservations/${requestId}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${userToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            status, 
+            donorResponse: response || (status === 'approved' ? 'Request approved!' : 'Request rejected.')
+          })
+        });
+        
+        const data = await apiResponse.json();
+        
+        if (apiResponse.ok) {
+          addMessage(`✅ Request ${status} successfully`, 'success');
+          loadLiveRequests();
+          loadDashboardSummary();
+          loadMyFoodItems();
+        } else {
+          addMessage(data.message, 'error');
+        }
+      } catch (error) {
+        addMessage(`Failed to respond to request: ${error.message}`, 'error');
+      }
+    }
+    
+    // Refresh functions
+    function refreshMyFood() {
+      addMessage('🔄 Refreshing food items...', 'info');
+      loadMyFoodItems();
+    }
+    
+    function refreshRequests() {
+      addMessage('🔄 Refreshing requests...', 'info');
+      loadLiveRequests();
+    }
+    
+    // Socket connection for real-time notifications
+    function setupSocketConnection() {
+      try {
+        socket = io('http://localhost:5000');
+        
+        socket.on('notification', (message) => {
+          console.log('🔔 Real-time notification:', message);
+          
+          // Show notification
+          showNotification(message);
+          
+          // Play sound if enabled
+          if (notificationSoundEnabled) {
+            playNotificationSound();
+          }
+          
+          // Refresh data if it's a food request
+          if (message.includes('wants') || message.includes('request')) {
+            setTimeout(() => {
+              loadLiveRequests();
+              loadDashboardSummary();
+            }, 1000);
+          }
+        });
+        
+        socket.on('connect', () => {
+          console.log('🔌 Connected to real-time notifications');
+        });
+        
+      } catch (error) {
+        console.warn('Failed to setup socket connection:', error);
+      }
+    }
+    
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.className = 'notification-sound';
+      notification.innerHTML = `<strong>🔔 New Notification</strong><br>${message}`;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 5000);
+    }
+    
+    function playNotificationSound() {
+      try {
+        // Create audio context and play beep
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.2);
+      } catch (error) {
+        console.warn('Failed to play notification sound:', error);
+      }
+    }
+    
+    function toggleNotificationSound() {
+      notificationSoundEnabled = !notificationSoundEnabled;
+      const button = document.getElementById('soundToggle');
+      button.textContent = `🔊 Sound: ${notificationSoundEnabled ? 'ON' : 'OFF'}`;
+      addMessage(`Notification sound ${notificationSoundEnabled ? 'enabled' : 'disabled'}`, 'info');
+    }
+    
+    function updateRequestBadge(count) {
+      const badge = document.getElementById('requestBadge');
+      if (count > 0) {
+        badge.textContent = count;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+    
+    // Auto-refresh functionality
+    function startAutoRefresh() {
+      refreshInterval = setInterval(() => {
+        if (userData && userToken) {
+          loadDashboardSummary();
+          loadLiveRequests();
+        }
+      }, 30000); // Refresh every 30 seconds
+    }
+    
+    function stopAutoRefresh() {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+      }
+    }
+    
+    // Logout function
+    function performLogout() {
+      localStorage.clear();
+      userToken = null;
+      userData = null;
+      
+      if (socket) {
+        socket.disconnect();
+      }
+      
+      stopAutoRefresh();
+      updateUI(false);
+      addMessage('Logged out successfully', 'info');
+    }
+  </script>
+</body>
+</html>
