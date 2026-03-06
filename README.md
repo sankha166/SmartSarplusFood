@@ -247,10 +247,6 @@ This system helps reduce food waste by:
 4. Push to branch (`git push origin feature/new-feature`)
 5. Open Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License.
-
 ## 📞 Support
 
 For issues or questions:
@@ -260,3 +256,4 @@ For issues or questions:
 ---
 
 **Made with ❤️ for reducing food waste and building sustainable communities**
+
